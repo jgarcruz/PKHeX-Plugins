@@ -1,0 +1,7 @@
+<!--removes the AutoLegalityMod project from builds since it's a WinForms project-->
+<Solution>
+  <Project Path="AutoModTests/AutoModTests.csproj" />
+  <Project Path="PKHeX.Core.AutoMod/PKHeX.Core.AutoMod.csproj" />
+  <Project Path="PKHeX.Core.Enhancements/PKHeX.Core.Enhancements.csproj" />
+  <Project Path="PKHeX.Core.Injection/PKHeX.Core.Injection.csproj" />
+</Solution>

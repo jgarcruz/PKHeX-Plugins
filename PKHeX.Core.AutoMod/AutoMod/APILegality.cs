@@ -299,7 +299,7 @@ public static class APILegality
         var versionlist = GameUtil.GetVersionsWithinRange(template, template.Context);
         GameVersion[] gamelist = APILegality.GameVersionPriority switch
         {
-            GameVersionPriorityType.NativeOnly => [..GetPairedVersions(destVer, versionlist).OrderByDescending(j=>j==destVer)],
+            GameVersionPriorityType.NativeOnly => [.. GetPairedVersions(destVer, versionlist).OrderByDescending(j => j == destVer)],
             GameVersionPriorityType.PriorityOrder => [.. PriorityOrder.Where(z => versionlist.Contains(z))],
             _ => [.. versionlist.OrderByDescending(z => z).ToArray()]
         };
@@ -356,11 +356,11 @@ public static class APILegality
             gamelist = filter.Comparer switch
             {
                 InstructionComparer.IsEqual => result,
-                InstructionComparer.IsNotEqual  => [.. GameUtil.GameVersions.Where(z => !result.Contains(z))],
+                InstructionComparer.IsNotEqual => [.. GameUtil.GameVersions.Where(z => !result.Contains(z))],
                 InstructionComparer.IsGreaterThan => [.. GameUtil.GameVersions.Where(z => result.Any(g => z > g))],
                 InstructionComparer.IsGreaterThanOrEqual => [.. GameUtil.GameVersions.Where(z => result.Any(g => z >= g))],
                 InstructionComparer.IsLessThan => [.. GameUtil.GameVersions.Where(z => result.Any(g => z < g))],
-                InstructionComparer.IsLessThanOrEqual  => [.. GameUtil.GameVersions.Where(z => result.Any(g => z <= g))],
+                InstructionComparer.IsLessThanOrEqual => [.. GameUtil.GameVersions.Where(z => result.Any(g => z <= g))],
                 _ => result,
             };
             return gamelist.Length != 0;
@@ -400,7 +400,7 @@ public static class APILegality
         if (AllowTrainerOverride && regen is { HasTrainerSettings: true, Trainer: not null })
             return regen.Trainer.MutateLanguage(mutate, ver);
 
-        return UseTrainerData ? TrainerSettings.GetSavedTrainerData(ver).MutateLanguage(mutate, ver) : TrainerSettings.DefaultFallback(ver, regen.Extra.Language??(LanguageID)dest.Language);
+        return UseTrainerData ? TrainerSettings.GetSavedTrainerData(ver).MutateLanguage(mutate, ver) : TrainerSettings.DefaultFallback(ver, regen.Extra.Language ?? (LanguageID)dest.Language);
     }
 
     /// <summary>
@@ -505,7 +505,7 @@ public static class APILegality
             return false;
 
         // Further shiny filtering if set is regen template
-        if (set is RegenTemplate { Regen: { HasExtraSettings: true } regen} && enc.Generation != 9)
+        if (set is RegenTemplate { Regen: { HasExtraSettings: true } regen } && enc.Generation != 9)
         {
             var shinytype = regen.Extra.ShinyType;
             if (shinytype == Shiny.AlwaysStar && enc.Shiny == Shiny.AlwaysSquare)
@@ -884,7 +884,7 @@ public static class APILegality
         {
             enc3.SetFromIVsUnown((PK3)pk, criteria);
         }
-        
+
     }
 
     private static void FindTeraPIDIV<T>(PK9 pk, T enc, IBattleTemplate set, EncounterCriteria criteria) where T : ITeraRaid9, IEncounterTemplate
@@ -1239,7 +1239,7 @@ public static class APILegality
                 Revise(criteria, def: criteria.IV_DEF, spe: criteria.IV_SPE),
             (int)Species.Pyukumuku when criteria is { IV_DEF: 0, IV_SPD: 0 } && set.Ability == (int)Ability.InnardsOut =>
                 Revise(criteria, def: criteria.IV_DEF, spd: criteria.IV_SPD),
-            (int)Species.Unown when enc.Generation is 4 => criteria with { Form = (sbyte)set.Form},
+            (int)Species.Unown when enc.Generation is 4 => criteria with { Form = (sbyte)set.Form },
             _ => Revise(criteria, atk: criteria.IV_ATK == 0 ? (sbyte)0 : (sbyte)-1, spe: criteria.IV_SPE == 0 ? (sbyte)0 : (sbyte)-1),
         };
     }
@@ -1248,7 +1248,7 @@ public static class APILegality
         sbyte hp = -1, sbyte atk = -1, sbyte def = -1, sbyte spa = -1, sbyte spd = -1, sbyte spe = -1)
         => enc with
         {
-            IV_HP  = hp,
+            IV_HP = hp,
             IV_ATK = atk,
             IV_DEF = def,
             IV_SPA = spa,
@@ -1280,9 +1280,9 @@ public static class APILegality
         // 5: JP
         // 7, 14: USA
         // else: EUR
-        5       => (0, 0, 001),
+        5 => (0, 0, 001),
         7 or 14 => (1, 0, 049),
-        _       => (2, 0, 105),
+        _ => (2, 0, 105),
     };
 
     private static (byte ConsoleRegion, byte Region, byte Country) GetVivillonRegion(LanguageID language) => language switch
@@ -1421,7 +1421,7 @@ public static class APILegality
             raw.IsEgg = true;
             raw.SetEggMoves(set, enc);
             raw.CurrentFriendship = (byte)EggStateLegality.GetMinimumEggHatchCycles(raw);
-            
+
             // if egg wasn't originally obtained by OT => Link Trade, else => None
             if (raw.Format >= 4)
             {
