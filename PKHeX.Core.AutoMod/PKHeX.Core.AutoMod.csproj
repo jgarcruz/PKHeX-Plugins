@@ -1,9 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-<<<<<<< HEAD
-    <PackageReference Include="PKHeX.Core" Version="26.3.6" />
-=======
     <PackageReference Include="PKHeX.Core" Version="26.03.06" />
->>>>>>> upstream/cherrytree
   </ItemGroup>
 </Project>
