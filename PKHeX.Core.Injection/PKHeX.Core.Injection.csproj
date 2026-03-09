@@ -1,6 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <PackageReference Include="LibUsbDotNet" Version="2.2.29" />
+<<<<<<< HEAD
     <PackageReference Include="PKHeX.Core" Version="26.3.6" />
+=======
+    <PackageReference Include="PKHeX.Core" Version="26.03.06" />
+>>>>>>> upstream/cherrytree
   </ItemGroup>
 </Project>

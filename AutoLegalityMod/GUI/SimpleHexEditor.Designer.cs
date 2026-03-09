@@ -125,6 +125,7 @@ namespace AutoModPlugins.GUI
             RT_Timer.Size = new System.Drawing.Size(61, 23);
             RT_Timer.TabIndex = 20;
             RT_Timer.Value = new decimal(new int[] { 1000, 0, 0, 0 });
+            RT_Timer.ValueChanged += RT_Timer_ValueChanged;
             // 
             // B_Load
             // 

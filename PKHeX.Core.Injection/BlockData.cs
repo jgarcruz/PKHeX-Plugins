@@ -9,4 +9,5 @@ public record BlockData
     public ulong Offset { get; set; }
     public RWMethod Method { get; set; } = RWMethod.Heap;
     public SCTypeCode Type { get; set; } = SCTypeCode.None;
+    public bool IsSecured { get; set; } = false;
 }

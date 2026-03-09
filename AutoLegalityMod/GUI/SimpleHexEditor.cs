@@ -12,7 +12,7 @@ namespace AutoModPlugins.GUI;
 public partial class SimpleHexEditor : Form
 {
     public byte[] Bytes;
-    private readonly System.Timers.Timer refresh = new();
+    public readonly System.Timers.Timer refresh = new();
     private static ulong address;
     private static bool decrypt;
     private static uint block_key;
@@ -85,7 +85,7 @@ public partial class SimpleHexEditor : Form
             }
 
             var r_text = string.Join(" ", result.Select(z => $"{z:X2}"));
-            RTB_RAM.Invoke((MethodInvoker) delegate
+            RTB_RAM.Invoke((MethodInvoker)delegate
             {
                 if (RTB_RAM.Text != r_text) // Prevent text updates if there is no update since they hinder copying
                 {
@@ -95,7 +95,7 @@ public partial class SimpleHexEditor : Form
             if (RT_Timer.Enabled)
             {
                 RT_Timer.Invoke(
-                    (MethodInvoker) delegate
+                    (MethodInvoker)delegate
                     {
                         refresh.Interval = (double)RT_Timer.Value;
                     });
@@ -214,6 +214,11 @@ public partial class SimpleHexEditor : Form
             }
             catch (Exception) { Debug.Write("form closing error"); }
         }
+    }
+
+    private void RT_Timer_ValueChanged(object sender, EventArgs e)
+    {
+        refresh.Interval = (double)RT_Timer.Value;
     }
 }
 

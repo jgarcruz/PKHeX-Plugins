@@ -1,14 +1,15 @@
+using AutoModPlugins.GUI;
+using PKHeX.Core;
+using PKHeX.Core.Injection;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
-using AutoModPlugins.GUI;
-using PKHeX.Core;
-using PKHeX.Core.Injection;
-using System.Drawing;
 namespace AutoModPlugins;
 
 public partial class LiveHeXUI : Form, ISlotViewer<PictureBox>
@@ -301,6 +302,8 @@ public partial class LiveHeXUI : Form, ISlotViewer<PictureBox>
 
         var compatible = InjectionBase.SaveCompatibleWithTitle(SAV.SAV, titleID);
         var lv = compatible ? InjectionBase.GetVersionFromTitle(titleID, gameVer) : LiveHeXVersion.Unknown;
+        if (lv >= LiveHeXVersion.FRLG_E_v100)
+            gameName = "FireRed/LeafGreen";
         if (!compatible && !_settings.EnableDevMode)
         {
             var saveName = GameInfo.GetVersionName(SAV_Version);
@@ -327,7 +330,6 @@ public partial class LiveHeXUI : Form, ISlotViewer<PictureBox>
         Remote.Bot = new PokeSysBotMini(connect_ver, nx);
         if (lv is LiveHeXVersion.Unknown && _settings.EnableDevMode)
             return (LiveHeXValidation.None, "", lv);
-
         var data = Remote.Bot.ReadSlot(0, 0);
         var pkm = SAV.SAV.GetDecryptedPKM(data.ToArray());
         bool valid = pkm.Species <= pkm.MaxSpeciesID && pkm.ChecksumValid &&
@@ -540,6 +542,12 @@ public partial class LiveHeXUI : Form, ISlotViewer<PictureBox>
             var blks = save_blocks.Order();
             return blks;
         }
+        if (Remote.Bot.Injector is LPFRLG)
+        {
+            var save_blocks = LPFRLG.SCBlocks[lv].Select(z => z.Display).Distinct();
+            var blks = save_blocks.Order();
+            return blks;
+        }
 
         return new List<string>();
     }
@@ -733,7 +741,12 @@ public partial class LiveHeXUI : Form, ISlotViewer<PictureBox>
     {
         var txt = CB_BlockName.Text;
         var version = Remote.Bot.Version;
-
+        if (version >= LiveHeXVersion.FRLG_E_v100)
+        {
+            if (txt == "Items")
+                txt = "Large";
+            ReadBlock(Remote.Bot, SAV.SAV, "SecurityKey", out _);
+        }
         var valid = ReadBlock(Remote.Bot, SAV.SAV, txt, out var data);
         if (!valid || data is null)
         {
@@ -817,7 +830,16 @@ public partial class LiveHeXUI : Form, ISlotViewer<PictureBox>
             var res = form.ShowDialog();
             write = res == DialogResult.OK;
         }
+        else if (sb is object)
+        {
+            using var form = new SimpleHexEditor(data[0]);
 
+            form.PG_BlockView.Visible = true;
+            form.PG_BlockView.SelectedObject = SAV.SAV;
+            
+            var res = form.ShowDialog();
+            write = res == DialogResult.OK;
+        }
         if (!write)
             return;
 
@@ -888,12 +910,21 @@ public partial class LiveHeXUI : Form, ISlotViewer<PictureBox>
             {
                 LPBasic => [.. LPBasic.SCBlocks[version].Where(z => z.Display == display)],
                 LPPointer => [.. LPPointer.SCBlocks[version].Where(z => z.Display == display)],
+                LPFRLG => [.. LPFRLG.SCBlocks[version].Where(z => z.Display == display)],
                 _ => [],
             };
 
             if (subblocks.Length == 0)
                 return false;
-
+            if (Remote.Bot.Injector is LPFRLG)
+            {
+                var prop = sav.GetType().GetProperty(display) ?? throw new Exception($"{display} not found");
+                if (display == "Large")
+                    sb = ((SAV3)sav).Large.ToArray();
+                else
+                    sb = prop.GetValue(sav);
+                return sb is not null;
+            }
             // Check for SCBlocks or SaveBlocks based on name. (SCBlocks will invoke the hex editor, SaveBlocks will invoke a property grid
             var props = sav.GetType().GetProperty("Blocks");
             if (props is null)
@@ -1042,3 +1073,5 @@ internal class HexTextBox : TextBox
         base.WndProc(ref m);
     }
 }
+
+

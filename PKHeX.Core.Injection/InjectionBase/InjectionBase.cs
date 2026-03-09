@@ -27,7 +27,18 @@ public abstract class InjectionBase
     private const string Violet_ID = "01008F6008C5E000";
 
     private const string ZA_ID = "0100F43008C44000";
-
+    private const string FR_E_ID = "0100554023408000";
+    private const string LG_E_ID = "010034D02340E000";
+    private const string FR_S_ID = "0100EB702342C000";
+    private const string LG_S_ID = "01002B5023434000";
+    private const string FR_F_ID = "01004B3023412000";
+    private const string LG_F_ID = "010087C02342E000";
+    private const string FR_D_ID = "01007F8023416000";
+    private const string LG_D_ID = "0100FD6023430000";
+    private const string FR_I_ID = "010092302342A000";
+    private const string LG_I_ID = "01005C7023432000";
+    private const string FR_J_ID = "01006FA0233F8000";
+    private const string LG_J_ID = "0100F1E0233FA000";
     private static readonly Dictionary<string, LiveHeXVersion[]> SupportedTitleVersions = new()
     {
         { LetsGoPikachu_ID, [LGPE_v102] },
@@ -40,6 +51,18 @@ public abstract class InjectionBase
         { Scarlet_ID, [SV_v101, SV_v110, SV_v120, SV_v130, SV_v131, SV_v132, SV_v201, SV_v202, SV_v300, SV_v301, SV_v400] },
         { Violet_ID,  [SV_v101, SV_v110, SV_v120, SV_v130, SV_v131, SV_v132, SV_v201, SV_v202, SV_v300, SV_v301, SV_v400] },
         { ZA_ID, [ZA_v101, ZA_v102, ZA_v103, ZA_v200, ZA_v201] },
+        { FR_E_ID, [FRLG_E_v100] },
+        { LG_E_ID, [FRLG_E_v100] },
+        { FR_S_ID, [FRLG_S_v100] },
+        { LG_S_ID, [FRLG_S_v100] },
+        { FR_F_ID, [FRLG_F_v100] },
+        { LG_F_ID, [FRLG_F_v100] },
+        { FR_D_ID, [FRLG_D_v100] },
+        { LG_D_ID, [FRLG_D_v100] },
+        { FR_I_ID, [FRLG_I_v100] },
+        { LG_I_ID, [FRLG_I_v100] },
+        { FR_J_ID, [FRLG_J_v100] },
+        { LG_J_ID, [FRLG_J_v100] },
     };
 
     public virtual Dictionary<string, string> SpecialBlocks { get; } = [];
@@ -54,7 +77,8 @@ public abstract class InjectionBase
 
         if (LPPointer.SupportedVersions.Contains(version))
             return new LPPointer();
-
+        if (LPFRLG.SupportedVersions.Contains(version))
+            return new LPFRLG();
         if (!LPBasic.SupportedVersions.Contains(version))
             throw new ArgumentOutOfRangeException(nameof(version), version, $"Unknown {nameof(LiveHeXVersion)}.");
 
@@ -70,7 +94,7 @@ public abstract class InjectionBase
     public virtual void SendSlot(PokeSysBotMini psb, ReadOnlySpan<byte> data, int box, int slot) { }
 
     public virtual void WriteBlocksFromSAV(PokeSysBotMini psb, string block, SaveFile sav) { }
-
+    public virtual void WriteBlocksFromStringSAV(PokeSysBotMini psb, string block, SaveFile sav, Span<byte> data) { }
     public virtual void WriteBlockFromString(PokeSysBotMini psb, string block, ReadOnlySpan<byte> data, object sb) { }
 
     public virtual bool ReadBlockFromString(PokeSysBotMini psb, SaveFile sav, string block, out List<byte[]>? read)
@@ -81,6 +105,7 @@ public abstract class InjectionBase
 
     public static bool SaveCompatibleWithTitle(SaveFile sav, string titleID) => sav switch
     {
+        SAV3FRLG when titleID is FR_D_ID or FR_E_ID or FR_F_ID or FR_I_ID or FR_J_ID or FR_S_ID or LG_D_ID or LG_E_ID or LG_F_ID or LG_I_ID or LG_J_ID or LG_S_ID => true,
         SAV9ZA when titleID is ZA_ID => true,
         SAV9SV when titleID is Scarlet_ID or Violet_ID => true,
         SAV8LA when titleID is LegendsArceus_ID => true,
